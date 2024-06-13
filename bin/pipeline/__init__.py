@@ -1,26 +1,30 @@
 # import constants
 from _constants import *
 
+# import types
+from typing import Any
+
 # import libs
 import pandas as pd
 import joblib
 
-from preprocess import decoding_teencode, \
+from _utils.preprocess import decoding_teencode, \
     remove_tag_icon_link, \
     remove_icon_punct_rendun_space, tokenization, \
     remove_stop_word, text_normalize
-from transform import word_to_vector
+from _utils.transform import word_to_vector
 
 
 class Pipeline:
-    def __init__(self) -> None:
-        pass
+    def __init__(self):
+        self.trained_model: Any = None
 
-    def __preprocess(
+    def preprocess(
         self,
         X: pd.DataFrame
     ) -> pd.DataFrame:
         X_copy: pd.DataFrame = X.copy()
+        print("Original:", X_copy.head(5), sep="\n", end="\n\n")
 
         # decoding teencode
         X_copy = X_copy.applymap(decoding_teencode)
@@ -35,10 +39,10 @@ class Pipeline:
         X_copy = X_copy.applymap(tokenization)
         print("Tokenizatioin:", X_copy.head(5), sep="\n", end="\n\n")
 
-        # remove icon, punct, rendun space
-        X_copy = X_copy.applymap(remove_icon_punct_rendun_space)
-        print("Remove icon, punct, rendun space:",
-              X_copy, sep="\n", end="\n\n")
+        # # remove icon, punct, rendun space
+        # X_copy = X_copy.applymap(remove_icon_punct_rendun_space)
+        # print("Remove icon, punct, rendun space:",
+        #       X_copy, sep="\n", end="\n\n")
 
         # lower case
         X_copy = X_copy.applymap(lambda x: x.lower())
@@ -54,7 +58,7 @@ class Pipeline:
 
         return X_copy
 
-    def __transform(
+    def transform(
         self,
         X: pd.DataFrame
     ) -> str:
@@ -62,27 +66,29 @@ class Pipeline:
         X_copy = X_copy.applymap(word_to_vector)
         return X_copy
 
-    def __load_pretrained_model(
+    def load_pretrained_model(
         self,
         model_name: str
     ) -> joblib:
         if model_name.lower() not in MODEL_NAME_LIST:
             raise ValueError(f"Model name {model_name} is not supported.")
 
-        return joblib.load(MODEL_PATH.format(model_name))
+        self.trained_model = joblib.load(MODEL_PATH.format(model_name))
+
+        return self.trained_model
 
     def run(
         self,
         X: pd.DataFrame
     ) -> pd.DataFrame:
         # Preprocess
-        X_preprocessed: pd.DataFrame = self.__preprocess(X)
+        X_preprocessed: pd.DataFrame = self.preprocess(X)
 
         # Word to vector
-        X_transformed: pd.DataFrame = self.__transform(X_preprocessed)
+        X_transformed: pd.DataFrame = self.transform(X_preprocessed)
 
         # Load model
-        model: joblib = self.__load_pretrained_model("random_forest_model")
+        model: joblib = self.load_pretrained_model("random_forest_model")
 
         # Predict
         y_pred: pd.DataFrame = model.predict(X_transformed)
@@ -91,26 +97,7 @@ class Pipeline:
 
     def test(
         self,
-        sentence: str
+        X: pd.DataFrame,
     ):
-        df_test: pd.DataFrame = pd.DataFrame([sentence], columns=["sentence"])
-        return self.__preprocess(df_test)
-
-    # def test(
-    #     self,
-    #     X: pd.DataFrame
-    # ):
-    #     return self.__preprocess(X)
-
-
-if __name__ == "__main__":
-    pipeline = Pipeline()
-
-    sentence: str = "Tôi là Nguyễn Khắc Trúc."
-    print(sentence)
-    print(pipeline.test(sentence))
-    # df: pd.DataFrame = pd.read_csv(
-    #     "./datasets/youtube_dataset_pbvm.csv", header=0)
-    # # print(df["text"])
-
-    # pipeline.test(df[['text']].sample(10))
+        X_preprocessed: pd.DataFrame = self.preprocess(X)
+        return X_preprocessed

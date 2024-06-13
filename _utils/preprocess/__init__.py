@@ -1,24 +1,31 @@
-# import constants
-from _constants import *
-
 # import libs
 import re
 import gensim
-import os
 from underthesea import text_normalize
 
+# import utils
 from _utils import VnCoreNLP
+
+# import constants
+from _constants import *
 
 
 def decoding_teencode(sentence: str):
-    words = sentence.split()
-    replace_words = [
-        TEENCODE_DICT.get(word, word)
-        for word in words
-    ]
-    sententce_after_replaced: str = " ".join(replace_words)
+    # print(">> sentence:", sentence, end="\n\n")
+    # if not isinstance(sentence, str):
+    #     sentence = str(sentence)
+    try:
+        words = sentence.split()
+        replace_words = [
+            TEENCODE_DICT.get(word, word)
+            for word in words
+        ]
+        sententce_after_replaced: str = " ".join(replace_words)
 
-    return sententce_after_replaced
+        return sententce_after_replaced
+    except Exception as e:
+        print(f"Have error {e} with sentence: {sentence}")
+        return ''
 
 
 def remove_tag_icon_link(sentence: str):
