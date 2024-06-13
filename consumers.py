@@ -2,7 +2,7 @@
 from pyspark.sql import SparkSession
 from pyspark.sql import DataFrame
 from pyspark.sql.streaming import StreamingQuery
-from bin.consumer import Consumer
+from bin.Streaming import Consumer
 
 # import constants
 from _constants import *

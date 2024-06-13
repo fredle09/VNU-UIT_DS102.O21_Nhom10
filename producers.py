@@ -1,5 +1,5 @@
 # import libs
-from bin.producer import using_producer_for_streaming
+from bin.streaming.producer import using_producer_for_streaming
 
 # import constants
 from _constants import *
