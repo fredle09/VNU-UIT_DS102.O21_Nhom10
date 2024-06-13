@@ -18,7 +18,11 @@ def main():
     # print(pipe.test(df[["text"]]))
     df_preprocessed: pd.DataFrame = pipe.test(df[["text"]])
     df_preprocessed.to_csv(
-        os.path.join(PATH, "datasets", "youtube_dataset_pbvm_preprocessed.csv"),
+        os.path.join(
+            PATH,
+            "datasets",
+            "youtube_dataset_pbvm_preprocessed.csv"
+        ),
         index=False,
         header=True
     )
