@@ -1,13 +1,13 @@
 # import libs
-from bin.streaming.producer import using_producer_for_streaming
+from bin.streaming.producer import Producer
 
 # import constants
 from _constants import *
 
-import findspark
-findspark.init()
 
 if __name__ == '__main__':
-    using_producer_for_streaming(
-        "./datasets/youtube_dataset_pbvm.csv"
+    prod: Producer = Producer()
+    prod.send_message(
+        topic=CAPTURE_TOPIC,
+        csv_file_path="youtube_dataset_pbvm.csv",
     )
