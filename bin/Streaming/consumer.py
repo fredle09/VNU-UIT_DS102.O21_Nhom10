@@ -1,14 +1,6 @@
 # import libs
-import sys
-
-# import types
-from typing import Optional
-
-# import libs
-from datetime import datetime
-from pyspark.sql import SparkSession
-from pyspark.sql import DataFrame
-from pyspark.sql import functions as F
+from kafka import KafkaConsumer
+import json
 
 # import constants
 from _constants import *
@@ -18,65 +10,44 @@ class Consumer:
     def __init__(
         self,
         topic: str,
-        schema_list: list[str],
-        spark_session: SparkSession,
-    ) -> None:
+    ):
         self.topic: str = topic
-        self.schema_list: list[str] = schema_list
-        self.spark_session: SparkSession = spark_session
-
-    def get_streaming_df(self) -> DataFrame:
-        raw_streaming_df: DataFrame = (
-            self.spark_session.readStream
-            .format("kafka")
-            .option("kafka.bootstrap.servers", KAFKA_BROKER_SERVER)
-            .option("subscribe", self.topic)
-            .option("startingOffsets", "latest")
-            .load()
+        self.__consumer = KafkaConsumer(
+            self.topic,
+            bootstrap_servers=KAFKA_BROKER_SERVER,
+            auto_offset_reset="latest",
+            enable_auto_commit=True,
+            key_deserializer=lambda x: (
+                x.decode('utf-8')
+                if x is not None
+                else None
+            ),
+            value_deserializer=lambda x: (
+                Consumer.__safe_json_loads(x)
+                if x is not None
+                else None
+            ),
         )
 
-        streaming_df: DataFrame = (
-            raw_streaming_df.selectExpr("CAST(value AS STRING)")
-            .select(F.from_json("value", ", ".join(self.schema_list)).alias("data"))
-            .selectExpr("data.*")
-        )
+    @staticmethod
+    def __safe_json_loads(x):
+        try:
+            return json.loads(x.decode('utf-8'))
+        except json.JSONDecodeError as e:
+            print(f"JSONDecodeError: {e}")
+            print(f"Raw data: {x}")
+            print("---")
+            return None
 
-        return streaming_df
-
-    def get_history_df(
+    def get_message(
         self,
-        from_timestamp: Optional[datetime] = None,
-        timestamp_col: str = "updated_at"
-    ) -> DataFrame:
-        raw_history_df: DataFrame = (
-            self.spark_session.read
-            .format("kafka")
-            .option("kafka.bootstrap.servers", KAFKA_BROKER_SERVER)
-            .option("subscribe", self.topic)
-            .option("startingOffsets", "earliest")
-            .option("endingOffsets", "latest")
-            .load()
-        )
+        key: Optional[str] = None,
+    ):
+        for message in self.__consumer:
+            if key is not None and message.key != key:
+                continue
 
-        history_df: DataFrame = (
-            raw_history_df.tail(20).selectExpr("CAST(value AS STRING)")
-            .select(F.from_json("value", ", ".join(self.schema_list)).alias("data"))
-            .selectExpr("data.*")
-        )
-
-        if from_timestamp:
-            if timestamp_col not in [
-                col_type.split(" ")[0] for col_type in self.schema_list
-            ]:
-                raise ValueError(
-                    f"The {timestamp_col} column is not in the {self.schema_list}.",
-                )
-
-            history_df = history_df.filter(
-                F.col(timestamp_col) >= from_timestamp
-            )
-
-        return history_df
-
-
-sys.modules[__name__] = Consumer
+            print({
+                "key": message.key,
+                "value": message.value,
+            })
