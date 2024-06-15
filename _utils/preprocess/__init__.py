@@ -46,7 +46,7 @@ def remove_icon_punct_rendun_space(sentence: str):
 
 
 def tokenization(sentences: str):
-    rdrsegmenter = VnCoreNLP.get_instance()
+    rdrsegmenter = VnCoreNLP()
 
     sentence_lst: list[str] = rdrsegmenter.word_segment(sentences)
     res_sentences: str = " ".join(sentence_lst)
