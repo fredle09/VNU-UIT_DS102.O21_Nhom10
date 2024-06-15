@@ -21,14 +21,17 @@ class Pipeline:
 
     def preprocess(
         self,
-        X: pd.DataFrame
+        X: pd.DataFrame,
+        is_debug: bool = False
     ) -> pd.DataFrame:
         X_copy: pd.DataFrame = X.copy()
-        print("Original:", X_copy.head(5), sep="\n", end="\n\n")
+        if is_debug:
+            print("Original:", X_copy.head(5), sep="\n", end="\n\n")
 
         # decoding teencode
         X_copy = X_copy.applymap(decoding_teencode)
-        print("Encoding Teencode:", X_copy.head(5), sep="\n", end="\n\n")
+        if is_debug:
+            print("Encoding Teencode:", X_copy.head(5), sep="\n", end="\n\n")
 
         # # remove tag-name, icon, link
         # X_copy = X_copy.applymap(remove_tag_icon_link)
@@ -37,7 +40,8 @@ class Pipeline:
 
         # tokenization
         X_copy = X_copy.applymap(tokenization)
-        print("Tokenizatioin:", X_copy.head(5), sep="\n", end="\n\n")
+        if is_debug:
+            print("Tokenizatioin:", X_copy.head(5), sep="\n", end="\n\n")
 
         # # remove icon, punct, rendun space
         # X_copy = X_copy.applymap(remove_icon_punct_rendun_space)
@@ -46,7 +50,8 @@ class Pipeline:
 
         # lower case
         X_copy = X_copy.applymap(lambda x: x.lower())
-        print("Lower:", X_copy.head(5), sep="\n", end="\n\n")
+        if is_debug:
+            print("Lower:", X_copy.head(5), sep="\n", end="\n\n")
 
         # # remove stop word
         # X_copy = X_copy.applymap(remove_stop_word)
@@ -54,7 +59,8 @@ class Pipeline:
 
         # normalize text
         X_copy = X_copy.applymap(text_normalize)
-        print("Normalize text:", X_copy.head(5), sep="\n", end="\n\n")
+        if is_debug:
+            print("Normalize text:", X_copy.head(5), sep="\n", end="\n\n")
 
         return X_copy
 
