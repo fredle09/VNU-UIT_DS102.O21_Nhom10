@@ -1,6 +1,23 @@
 # import libs
 import os
 
+from time import sleep, time
+from json import dumps as json_dumps
+from datetime import datetime, timedelta
+from typing import Optional, Callable, Any
+
+import pandas as pd
+import numpy as np
+
+from pyspark.sql import DataFrame
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+from pyspark.sql.streaming.query import StreamingQuery
+
+import findspark
+
+findspark.init()
+
 
 PATH: str = os.path.dirname(os.path.abspath(__file__))
 
@@ -99,11 +116,11 @@ TEENCODE_DICT: dict[str, str] = {
 }
 
 # https://github.com/stopwords/vietnamese-stopwords?tab=readme-ov-file#license
-STOP_WORDS: list[str] = []
-with open(
-    "./vietnamese-stopwords-dash.txt",
-    mode='r',
-    encoding="utf-8"
-) as f:
-    if len(STOP_WORDS) == 0:
-        STOP_WORDS.extend(f.read().splitlines())
+# STOP_WORDS: list[str] = []
+# with open(
+#     "./vietnamese-stopwords-dash.txt",
+#     mode='r',
+#     encoding="utf-8"
+# ) as f:
+#     if len(STOP_WORDS) == 0:
+#         STOP_WORDS.extend(f.read().splitlines())
