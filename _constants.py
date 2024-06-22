@@ -1,4 +1,9 @@
 # import libs
+import findspark
+from pyspark.sql.streaming.query import StreamingQuery
+from pyspark.sql import functions as F
+from pyspark.sql import SparkSession
+from pyspark.sql import DataFrame
 import os
 
 from time import sleep, time
@@ -9,12 +14,6 @@ from typing import Optional, Callable, Any
 import pandas as pd
 import numpy as np
 
-from pyspark.sql import DataFrame
-from pyspark.sql import SparkSession
-from pyspark.sql import functions as F
-from pyspark.sql.streaming.query import StreamingQuery
-
-import findspark
 
 findspark.init()
 
