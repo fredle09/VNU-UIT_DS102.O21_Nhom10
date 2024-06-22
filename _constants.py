@@ -14,8 +14,11 @@ from typing import Optional, Callable, Any
 import pandas as pd
 import numpy as np
 
+from dotenv import load_dotenv
+
 
 findspark.init()
+load_dotenv()
 
 
 PATH: str = os.path.dirname(os.path.abspath(__file__))
@@ -123,3 +126,5 @@ TEENCODE_DICT: dict[str, str] = {
 # ) as f:
 #     if len(STOP_WORDS) == 0:
 #         STOP_WORDS.extend(f.read().splitlines())
+
+DATABASE_NAME = 'DS102.O21_GROUP10'
