@@ -7,3 +7,5 @@ datasets/
 trained_models/
 
 .ipynb_checkpoints/
+
+.env
