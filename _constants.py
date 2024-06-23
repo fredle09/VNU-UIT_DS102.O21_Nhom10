@@ -14,6 +14,8 @@ from typing import Optional, Callable, Any
 import pandas as pd
 import numpy as np
 
+import joblib
+
 from dotenv import load_dotenv
 
 
@@ -51,6 +53,7 @@ CAPTURE_YOUTUBE_SCHEMA_LIST: list[str] = [
 
 MODEL_NAME_LIST: list[str] = [
     "random_forest_model",
+    "text_vectorizer"
 ]
 
 MODEL_PATH: str = os.path.join(PATH, "trained_models/{}.joblib")
