@@ -6,13 +6,13 @@ from typing import Any
 
 # import libs
 import pandas as pd
-import joblib
 
 from _utils.preprocess import decoding_teencode, \
     remove_tag_icon_link, \
     remove_icon_punct_rendun_space, tokenization, \
     remove_stop_word, text_normalize
 from _utils.transform import word_to_vector
+from _utils import LoadModel
 
 
 class Pipeline:
@@ -70,18 +70,19 @@ class Pipeline:
     ) -> str:
         X_copy: pd.DataFrame = X.copy()
         X_copy = X_copy.applymap(word_to_vector)
+
         return X_copy
 
-    def load_pretrained_model(
-        self,
-        model_name: str
-    ) -> joblib:
-        if model_name.lower() not in MODEL_NAME_LIST:
-            raise ValueError(f"Model name {model_name} is not supported.")
+    # def load_pretrained_model(
+    #     self,
+    #     model_name: str
+    # ) -> joblib:
+    #     if model_name.lower() not in MODEL_NAME_LIST:
+    #         raise ValueError(f"Model name {model_name} is not supported.")
 
-        self.trained_model = joblib.load(MODEL_PATH.format(model_name))
+    #     self.trained_model = joblib.load(MODEL_PATH.format(model_name))
 
-        return self.trained_model
+    #     return self.trained_model
 
     def run(
         self,
@@ -94,7 +95,8 @@ class Pipeline:
         X_transformed: pd.DataFrame = self.transform(X_preprocessed)
 
         # Load model
-        model: joblib = self.load_pretrained_model("random_forest_model")
+        # model: joblib = self.load_pretrained_model("random_forest_model")
+        model: joblib = LoadModel("random_forest_model")
 
         # Predict
         y_pred: pd.DataFrame = model.predict(X_transformed)
