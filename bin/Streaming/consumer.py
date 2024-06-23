@@ -47,7 +47,7 @@ class Consumer:
             if key is not None and message.key != key:
                 continue
 
-            print({
+            yield {
                 "key": message.key,
                 "value": message.value,
-            })
+            }
