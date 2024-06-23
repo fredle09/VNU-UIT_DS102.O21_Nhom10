@@ -6,8 +6,7 @@ from _constants import *
 
 
 if __name__ == '__main__':
-    prod: Producer = Producer()
-    prod.send_message(
-        topic=CAPTURE_TOPIC,
+    prod: Producer = Producer(topic=CAPTURE_TOPIC)
+    prod.send_message_from_csv(
         csv_file_path="youtube_dataset_pbvm.csv",
     )
