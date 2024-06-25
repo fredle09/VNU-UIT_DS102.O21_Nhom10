@@ -12,6 +12,8 @@ def main():
         "It a Web app that would help the user in determining whether they will get admission in a Graduate Program or not.")
     st.sidebar.header("What tools where used to make this?")
     st.sidebar.text("The Model was made using a dataset from Kaggle along with using Kaggle notebooks to train the model. We made use of Sci-Kit learn in order to make our Linear Regression Model.")
+    with st.empty():
+        ...
 
     # part of our main method
     # taking the cgpa by giving in the range from 0 to 10
