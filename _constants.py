@@ -1,4 +1,5 @@
 # import libs
+import threading
 import findspark
 from pyspark.sql.streaming.query import StreamingQuery
 from pyspark.sql import functions as F
