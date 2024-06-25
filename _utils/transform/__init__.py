@@ -5,6 +5,6 @@ from _constants import *
 from _utils import LoadModel
 
 
-def word_to_vector(word: str) -> joblib:
+def word_to_vector(series: pd.Series) -> pd.Series:
     model = LoadModel("text_vectorizer")
-    return model.transform(word)
+    return model.transform(series)
