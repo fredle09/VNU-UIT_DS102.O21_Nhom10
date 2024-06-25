@@ -6,6 +6,20 @@ import os
 import py_vncorenlp
 
 
+def create_link_to_comment(platform: str, **kwargs) -> str:
+    YOUTUBE_URL_COMMENT_FORMAT = "https://www.youtube.com/watch?v={}&lc={}"
+    if platform == "youtube":
+        video_id: str = kwargs.get("video_id")
+        comment_id: str = kwargs.get("comment_id")
+        if video_id is None or comment_id is None:
+            raise ValueError("video_id and comment_id must be provided")
+        return YOUTUBE_URL_COMMENT_FORMAT.format(video_id, comment_id)
+
+    if platform == "reddit":
+        return kwargs.get("comment_link")
+    ...
+
+
 class VnCoreNLP:
     __instance = None
 
