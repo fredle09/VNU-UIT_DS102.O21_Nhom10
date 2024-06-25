@@ -5,6 +5,7 @@ VnCoreNLP/
 
 datasets/
 trained_models/
+jupyter/
 
 .ipynb_checkpoints/
 
