@@ -8,7 +8,6 @@ from pyspark.sql import DataFrame
 import os
 
 from time import sleep, time
-from json import dumps as json_dumps
 from datetime import datetime, timedelta
 from typing import Optional, Callable, Any
 
