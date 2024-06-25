@@ -6,7 +6,9 @@ from typing import Any
 
 # import libs
 import pandas as pd
+import random
 
+# import _utils
 from _utils.preprocess import decoding_teencode, \
     remove_tag_icon_link, \
     remove_icon_punct_rendun_space, tokenization, \
@@ -22,16 +24,24 @@ class Pipeline:
     def preprocess(
         self,
         X: pd.DataFrame,
+        input_col: str = "text",
         is_debug: bool = False
     ) -> pd.DataFrame:
+        if input_col not in X.columns:
+            raise ValueError(f"Column {input_col} not found in DataFrame")
+
+        output_col: str = f"{input_col}__preprocessed"
+        input_col: str = f"{input_col}"
         X_copy: pd.DataFrame = X.copy()
+        X_copy[output_col] = X_copy[input_col]
         if is_debug:
             print("Original:", X_copy.head(5), sep="\n", end="\n\n")
 
         # decoding teencode
-        X_copy = X_copy.applymap(decoding_teencode)
+        X_copy[output_col] = X_copy[output_col].map(decoding_teencode)
         if is_debug:
-            print("Encoding Teencode:", X_copy.head(5), sep="\n", end="\n\n")
+            print("Encoding Teencode:",
+                  X_copy[output_col].head(5), sep="\n", end="\n\n")
 
         # # remove tag-name, icon, link
         # X_copy = X_copy.applymap(remove_tag_icon_link)
@@ -39,7 +49,7 @@ class Pipeline:
         #       X_copy.head(5), sep="\n", end="\n\n")
 
         # tokenization
-        X_copy = X_copy.applymap(tokenization)
+        X_copy[output_col] = X_copy[output_col].map(tokenization)
         if is_debug:
             print("Tokenizatioin:", X_copy.head(5), sep="\n", end="\n\n")
 
@@ -49,7 +59,7 @@ class Pipeline:
         #       X_copy, sep="\n", end="\n\n")
 
         # lower case
-        X_copy = X_copy.applymap(lambda x: x.lower())
+        X_copy[output_col] = X_copy[output_col].map(lambda x: x.lower())
         if is_debug:
             print("Lower:", X_copy.head(5), sep="\n", end="\n\n")
 
@@ -58,48 +68,49 @@ class Pipeline:
         # print("Remove stop Word:", X_copy.head(5), sep="\n", end="\n\n")
 
         # normalize text
-        X_copy = X_copy.applymap(text_normalize)
+        X_copy[output_col] = X_copy[output_col].map(text_normalize)
         if is_debug:
             print("Normalize text:", X_copy.head(5), sep="\n", end="\n\n")
 
         return X_copy
 
-    def transform(
+    def predict(
         self,
-        X: pd.DataFrame
-    ) -> str:
+        X: pd.DataFrame,
+        input_col: str = "text",
+        model_name: str = None
+    ) -> pd.Series:
+        input_col: str = f"{input_col}__preprocessed"
+        if input_col not in X.columns:
+            raise ValueError(f"Column {input_col} not found in DataFrame")
+
         X_copy: pd.DataFrame = X.copy()
-        X_copy = X_copy.applymap(word_to_vector)
+        if model_name is None:
+            y_pred: pd.Series = X[input_col].map(
+                lambda _: random.choice([0, 1, 2])
+            )
+        elif model_name == "random_forest_model":
+            model: joblib = LoadModel("random_forest_model")
+            X_transform: pd.Series = word_to_vector(X_copy[input_col])
+            y_pred: pd.Series = model.predict(X_transform)
 
-        return X_copy
-
-    # def load_pretrained_model(
-    #     self,
-    #     model_name: str
-    # ) -> joblib:
-    #     if model_name.lower() not in MODEL_NAME_LIST:
-    #         raise ValueError(f"Model name {model_name} is not supported.")
-
-    #     self.trained_model = joblib.load(MODEL_PATH.format(model_name))
-
-    #     return self.trained_model
+        y_pred.name = "pred"
+        return y_pred
+        ...
 
     def run(
         self,
-        X: pd.DataFrame
+        X: pd.DataFrame,
+        model_name: Optional[str] = None
     ) -> pd.DataFrame:
         # Preprocess
         X_preprocessed: pd.DataFrame = self.preprocess(X)
 
-        # Word to vector
-        X_transformed: pd.DataFrame = self.transform(X_preprocessed)
-
-        # Load model
-        # model: joblib = self.load_pretrained_model("random_forest_model")
-        model: joblib = LoadModel("random_forest_model")
-
         # Predict
-        y_pred: pd.DataFrame = model.predict(X_transformed)
+        y_pred: pd.DataFrame = self.predict(
+            X_preprocessed,
+            model_name=model_name
+        )
 
         return y_pred
 
@@ -107,5 +118,5 @@ class Pipeline:
         self,
         X: pd.DataFrame,
     ):
-        X_preprocessed: pd.DataFrame = self.preprocess(X)
+        X_preprocessed: pd.DataFrame = self.preprocess(X, is_debug=True)
         return X_preprocessed
