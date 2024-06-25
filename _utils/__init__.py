@@ -6,17 +6,21 @@ import os
 import py_vncorenlp
 
 
-def create_link_to_comment(platform: str, **kwargs) -> str:
+def create_link_to_comment(row: dict) -> str:
     YOUTUBE_URL_COMMENT_FORMAT = "https://www.youtube.com/watch?v={}&lc={}"
+    platform: str = row.get("platform")
+    if platform is None:
+        raise ValueError("platform must be a column")
+
     if platform == "youtube":
-        video_id: str = kwargs.get("video_id")
-        comment_id: str = kwargs.get("comment_id")
+        video_id: str = row.get("video_id")
+        comment_id: str = row.get("comment_id")
         if video_id is None or comment_id is None:
-            raise ValueError("video_id and comment_id must be provided")
+            raise ValueError("video_id and comment_id must be columns")
         return YOUTUBE_URL_COMMENT_FORMAT.format(video_id, comment_id)
 
     if platform == "reddit":
-        return kwargs.get("comment_link")
+        return row.get("comment_link")
     ...
 
 

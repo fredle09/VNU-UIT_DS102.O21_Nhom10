@@ -6,6 +6,9 @@ from bin.streaming.consumer import Consumer
 from bin.pipeline import Pipeline
 from bin.store import MongoDB
 
+# import _utils
+from _utils import create_link_to_comment
+
 
 data_bucket: list[Any] = []
 
@@ -20,10 +23,9 @@ def consume_messages():
     try:
         for message in con.get_message():
             platform = message["key"]
-            data = json_dumps(message["value"])
-
+            data = message["value"]
             data_bucket.append({"platform": platform, **data})
-            print("Catched data")
+            print("Data received...")
     except KeyboardInterrupt:
         print("Exiting...")
         exit(0)
@@ -44,11 +46,16 @@ def predict_and_store():
                 local_data_bucket = data_bucket
                 data_bucket = []  # clear data_bucket
 
-                df_raw = pd.DataFrame(local_data_bucket)
-                y_pred = pipe.run(df_raw)
-                df_predict = df_raw.join(y_pred)
+                df_raw: pd.DataFrame = pd.DataFrame(local_data_bucket)
+                y_pred: pd.Series = pipe.run(df_raw)
+                df_predict: pd.DataFrame = df_raw.join(y_pred)
+                df_predict["link"] = (
+                    df_predict
+                    .apply(create_link_to_comment, axis=1)
+                )
                 df_predict_to_records = df_predict.to_dict(orient="records")
                 database["predicts"].insert_many(df_predict_to_records)
+                print("Predicted and stored data...")
 
                 i += 1
             else:
@@ -64,7 +71,10 @@ if __name__ == '__main__':
     consumer_thread = threading.Thread(target=consume_messages)
     predict_thread = threading.Thread(target=predict_and_store)
 
-    threads = [consumer_thread, predict_thread]
+    threads = [
+        consumer_thread,
+        predict_thread
+    ]
     [thread.start() for thread in threads]
     try:
         [thread.join() for thread in threads]
