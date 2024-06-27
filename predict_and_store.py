@@ -1,5 +1,6 @@
 # import constants
 from _constants import *
+from dotenv import load_dotenv
 
 # import bin
 from bin.streaming.consumer import Consumer
@@ -10,7 +11,16 @@ from bin.store import MongoDB
 from _utils import create_link_to_comment
 
 
+load_dotenv()
+
 data_bucket: list[Any] = []
+
+MONGODB_ATLAS_URL = os.getenv('MONGODB_ATLAS_URL')
+if MONGODB_ATLAS_URL is None:
+    raise ValueError("MONGODB_ATLAS_URL is not set")
+MONGODB_ATLAS_DB_NAME = os.getenv('MONGODB_ATLAS_DB_NAME')
+if MONGODB_ATLAS_DB_NAME is None:
+    raise ValueError("MONGODB_ATLAS_DB_NAME is not set")
 
 
 def consume_messages():
@@ -36,7 +46,11 @@ def predict_and_store():
     global data_bucket
 
     pipe: Pipeline = Pipeline()
-    database = MongoDB()
+
+    database = MongoDB(
+        url=MONGODB_ATLAS_URL,
+        db_name=MONGODB_ATLAS_DB_NAME,
+    )
 
     i = 0
 
