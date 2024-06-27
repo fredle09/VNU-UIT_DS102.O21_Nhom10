@@ -1,6 +1,8 @@
 # import libs
-from _constants import *
 from pymongo.mongo_client import MongoClient
+
+# import constants
+from _constants import *
 
 
 MONGODB_ATLAS_URL = os.getenv('MONGODB_ATLAS_URL')
