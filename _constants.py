@@ -1,5 +1,6 @@
 # import libs
 import os
+import threading
 
 from time import sleep
 from typing import Optional, Callable, Any
@@ -8,12 +9,6 @@ import pandas as pd
 import numpy as np
 
 import joblib
-
-from dotenv import load_dotenv
-
-
-# findspark.init()
-load_dotenv()
 
 
 PATH: str = os.path.dirname(os.path.abspath(__file__))
