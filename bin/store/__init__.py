@@ -15,7 +15,7 @@ class MongoDB:
     __db = None
 
     def __new__(cls):
-        if not cls.__db:
+        if cls.__db is None:
             client = MongoClient(MONGODB_ATLAS_URL)
 
             try:
