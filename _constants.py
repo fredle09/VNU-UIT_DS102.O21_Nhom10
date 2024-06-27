@@ -1,14 +1,7 @@
 # import libs
-import threading
-import findspark
-from pyspark.sql.streaming.query import StreamingQuery
-from pyspark.sql import functions as F
-from pyspark.sql import SparkSession
-from pyspark.sql import DataFrame
 import os
 
-from time import sleep, time
-from datetime import datetime, timedelta
+from time import sleep
 from typing import Optional, Callable, Any
 
 import pandas as pd
@@ -19,37 +12,15 @@ import joblib
 from dotenv import load_dotenv
 
 
-findspark.init()
+# findspark.init()
 load_dotenv()
 
 
 PATH: str = os.path.dirname(os.path.abspath(__file__))
 
-DATETIME_FORMAT: str = "%Y-%m-%dT%H:%M:%S%z"
-
-SCALA_VERSION: str = "2.12"
-SPARK_VERSION: str = "3.5.1"
-KAFKA_VERSION: str = "3.7.0"
-
 DELAY: int = 1
 
-SPARK_STREAMING_PACKAGES: list[str] = [
-    f"org.apache.spark:spark-sql-kafka-0-10_{SCALA_VERSION}:{SPARK_VERSION}",
-    f"org.apache.kafka:kafka-clients:{KAFKA_VERSION}"
-]
-
-KAFKA_BROKER_SERVER: str = "localhost:9092"
-
 CAPTURE_TOPIC: str = "capture"
-CAPTURE_YOUTUBE_SCHEMA_LIST: list[str] = [
-    "idx INT",
-    "author STRING",
-    "updated_at TIMESTAMP",
-    "like_count INT",
-    "text STRING",
-    "video_id STRING",
-    "public BOOLEAN"
-]
 
 MODEL_NAME_LIST: list[str] = [
     "random_forest_model",
@@ -129,5 +100,3 @@ TEENCODE_DICT: dict[str, str] = {
 # ) as f:
 #     if len(STOP_WORDS) == 0:
 #         STOP_WORDS.extend(f.read().splitlines())
-
-DATABASE_NAME = 'DS102.O21_GROUP10'
