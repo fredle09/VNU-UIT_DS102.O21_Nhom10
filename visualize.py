@@ -11,7 +11,10 @@ dataframe = pd.DataFrame(columns=["platform", "text", "pred", "link"])
 
 
 def init_connection():
-    return MongoDB()
+    return MongoDB(
+        url=st.secrets["MONGODB_ATLAS_URL"],
+        db_name=st.secrets["MONGODB_ATLAS_DB_NAME"],
+    )
 
 
 database = init_connection()

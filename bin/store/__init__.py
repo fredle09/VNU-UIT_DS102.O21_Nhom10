@@ -5,26 +5,18 @@ from pymongo.mongo_client import MongoClient
 from _constants import *
 
 
-MONGODB_ATLAS_URL = os.getenv('MONGODB_ATLAS_URL')
-if MONGODB_ATLAS_URL is None:
-    raise ValueError("MONGODB_ATLAS_URL is not set")
-MONGODB_ATLAS_DB_NAME = os.getenv('MONGODB_ATLAS_DB_NAME')
-if MONGODB_ATLAS_DB_NAME is None:
-    raise ValueError("MONGODB_ATLAS_DB_NAME is not set")
-
-
 class MongoDB:
     __db = None
 
-    def __new__(cls):
+    def __new__(cls, url: str, db_name: str):
         if cls.__db is None:
-            client = MongoClient(MONGODB_ATLAS_URL)
+            client = MongoClient(url)
 
             try:
                 client.admin.command('ping')
                 print("You successfully connected to MongoDB!")
 
-                cls.__db = client[MONGODB_ATLAS_DB_NAME]
+                cls.__db = client[db_name]
             except Exception as e:
                 print(e)
                 cls.__db = None
