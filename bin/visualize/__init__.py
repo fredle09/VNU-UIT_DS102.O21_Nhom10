@@ -72,8 +72,10 @@ def plot_top_words(df):
                     word_counts[word] = 1
 
         # Sort the dictionary by frequency in descending order
-        sorted_counts = sorted(word_counts.items(),
-                               key=lambda x: x[1], reverse=True)
+        sorted_counts = sorted(
+            word_counts.items(),
+            key=lambda x: x[1], reverse=True
+        )
 
         # Get the top 20 most frequent words
         top_words = sorted_counts[:20]
@@ -83,6 +85,7 @@ def plot_top_words(df):
         fig = go.Figure(
             [go.Bar(x=list(top_words.keys()), y=list(top_words.values()))]
         )
+
         fig.update_layout(
             title=f"Top 20 words - Label: {label}",
             xaxis_title="Word",
