@@ -1,6 +1,8 @@
 # import constants
 from _constants import *
 import os
+from transformers import BertTokenizer, TFBertForSequenceClassification
+import tensorflow as tf
 
 # import libs
 import py_vncorenlp
@@ -21,6 +23,9 @@ def create_link_to_comment(row: dict) -> str:
 
     if platform == "reddit":
         return row.get("comment_link")
+
+    if platform == "tiktok":
+        return "Không hỗ trợ"
     ...
 
 
@@ -38,14 +43,40 @@ class VnCoreNLP:
 
 
 class LoadModel:
-    __instance: dict[str, Any] = {}
+    __instance = None
 
     def __new__(cls, model_name: str):
-        if model_name.lower() not in MODEL_NAME_LIST:
-            raise ValueError(f"{model_name} must in {MODEL_NAME_LIST}")
+        if not cls.__instance:
+            cls.__instance = super().__new__(cls)
+            cls.__instance.model_name = model_name
+            cls.__instance._initialize(model_name)
+        return cls.__instance
 
-        if model_name not in cls.__instance.keys():
-            cls.__instance[model_name] = joblib.load(
-                MODEL_PATH.format(model_name))
+    def _initialize(self, model_name: str):
+        if model_name not in MODEL_NAME_DICT.keys():
+            raise ValueError("Model name not found in the dictionary")
 
-        return cls.__instance[model_name]
+        self.__instance = {}
+        self.__instance["model"] = TFBertForSequenceClassification.from_pretrained(
+            MODEL_NAME_DICT[model_name],
+            num_labels=3
+        )
+
+        self.__instance["model"].load_weights(
+            MODEL_PATH.format(model_name)
+        )
+
+        self.__instance["tokenizer"] = BertTokenizer.from_pretrained(
+            MODEL_NAME_DICT[model_name]
+        )
+
+    def predict(self, input_text: str) -> int:
+        inputs = self.__instance["tokenizer"](
+            input_text, return_tensors="tf",
+            padding=True, truncation=True
+        )
+
+        logits = self.__instance["model"](inputs).logits
+        probabilities = tf.nn.softmax(logits, axis=-1)
+        predicted_class_index = tf.argmax(probabilities, axis=-1).numpy()[0]
+        return predicted_class_index

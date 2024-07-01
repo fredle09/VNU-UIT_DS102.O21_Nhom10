@@ -6,7 +6,6 @@ from typing import Any
 
 # import libs
 import pandas as pd
-import random
 
 # import _utils
 from _utils.preprocess import decoding_teencode, \
@@ -18,8 +17,8 @@ from _utils import LoadModel
 
 
 class Pipeline:
-    def __init__(self):
-        self.trained_model: Any = None
+    def __init__(self, model_name: str = "BERTBase"):
+        self.model_name: Any = model_name
 
     def preprocess(
         self,
@@ -78,21 +77,15 @@ class Pipeline:
         self,
         X: pd.DataFrame,
         input_col: str = "text",
-        model_name: str = None
     ) -> pd.Series:
         input_col: str = f"{input_col}__preprocessed"
         if input_col not in X.columns:
             raise ValueError(f"Column {input_col} not found in DataFrame")
 
         X_copy: pd.DataFrame = X.copy()
-        if model_name is None:
-            y_pred: pd.Series = X[input_col].map(
-                lambda _: random.choice([0, 1, 2])
-            )
-        elif model_name == "random_forest_model":
-            model: joblib = LoadModel("random_forest_model")
-            X_transform: pd.Series = word_to_vector(X_copy[input_col])
-            y_pred: pd.Series = model.predict(X_transform)
+
+        model = LoadModel(self.model_name)
+        y_pred = X_copy[input_col].apply(model.predict)
 
         y_pred.name = "pred"
         return y_pred
@@ -101,7 +94,6 @@ class Pipeline:
     def run(
         self,
         X: pd.DataFrame,
-        model_name: Optional[str] = None
     ) -> pd.DataFrame:
         # Preprocess
         X_preprocessed: pd.DataFrame = self.preprocess(X)
@@ -109,7 +101,6 @@ class Pipeline:
         # Predict
         y_pred: pd.DataFrame = self.predict(
             X_preprocessed,
-            model_name=model_name
         )
 
         return y_pred
