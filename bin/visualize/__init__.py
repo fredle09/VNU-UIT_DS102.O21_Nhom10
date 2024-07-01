@@ -31,6 +31,24 @@ def init_page():
         )
 
 
+def count_label_pred_by_platform(df: pd.DataFrame):
+    group_df = (
+        df
+        .groupby(['platform', 'pred'])
+        .size()
+        .reset_index(name='count')
+    )
+
+    group_df["pred"] = group_df["pred"].astype(str)
+
+    fig = px.bar(
+        group_df, x='platform', y='count',
+        color='pred', barmode='group',
+    )
+
+    return st.plotly_chart(fig)
+
+
 def plot_top_words(df):
     # Get the list of unique labels
     labels = sorted(df['pred'].unique())

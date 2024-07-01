@@ -6,7 +6,7 @@ import pandas as pd
 # import bin
 from bin.store import MongoDB
 from bin.visualize import init_page, plot_top_words, \
-    plot_wordcloud
+    plot_wordcloud, count_label_pred_by_platform
 
 
 dataframe = pd.DataFrame(columns=["platform", "text", "pred", "link"])
@@ -47,28 +47,14 @@ def visualize():
             },
         )
 
-        st.dataframe(
-            data=(
-                dataframe.groupby(['platform', 'pred'])
-                .size()
-                .reset_index(name='count')
-            )
-        )
+        # plot count label predict by platform chart
+        count_label_pred_by_platform(dataframe)
 
-        st.bar_chart(
-            data=(
-                dataframe.groupby(['platform', 'pred'])
-                .size()
-                .reset_index(name='count')
-            ),
-            x="platform",
-            y="count",
-            color=[]
-        )
-
+        # plot top words chart
         for fig in plot_top_words(dataframe):
             st.plotly_chart(fig)
 
+        # plot wordcloud chart
         plot_wordcloud(dataframe)
 
 
