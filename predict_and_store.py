@@ -1,5 +1,6 @@
 # import libs
 from dotenv import load_dotenv
+from datetime import datetime
 
 # import bin
 from bin.streaming.consumer import Consumer
@@ -65,6 +66,7 @@ def predict_and_store():
                 df_raw: pd.DataFrame = pd.DataFrame(local_data_bucket)
                 y_pred: pd.Series = pipe.run(df_raw)
                 df_predict: pd.DataFrame = df_raw.join(y_pred)
+                df_predict["predict_at"] = datetime.utcnow().isoformat()
                 df_predict["link"] = (
                     df_predict
                     .apply(create_link_to_comment, axis=1)
