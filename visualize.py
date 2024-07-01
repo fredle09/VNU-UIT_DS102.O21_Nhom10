@@ -5,13 +5,27 @@ import pandas as pd
 
 # import bin
 from bin.store import MongoDB
-from bin.visualize import init_page, plot_top_words, \
-    plot_wordcloud, count_label_pred_by_platform
+from bin.visualize import sidebar, plot_top_words, \
+    plot_wordcloud, count_label_pred_by_platform, \
+    plot_dataframe
 
 
-dataframe = pd.DataFrame(columns=["platform", "text", "pred", "link"])
+if "dataframe" not in st.session_state:
+    st.session_state.dataframe = pd.DataFrame(
+        columns=["platform", "text", "pred", "link"]
+    )
+
+st.set_page_config(
+    page_title="Dashboard Phân biệt vùng miền",
+    page_icon="🙀",
+    layout="centered",
+    initial_sidebar_state="auto"
+)
+
+st.markdown("# Dashboard Phân biệt vùng miền")
 
 
+@st.cache_resource
 def init_connection():
     return MongoDB(
         url=st.secrets["MONGODB_ATLAS_URL"],
@@ -20,51 +34,40 @@ def init_connection():
 
 
 database = init_connection()
-count = 0
 
 
 # Function to fetch data from the database
 async def fetch_data():
-    global dataframe, count
+    global dataframe
     items = database["predicts"].find()
-    dataframe = pd.DataFrame(items)
-    count += 1
+    st.session_state.dataframe = pd.DataFrame(items)
 
 
 # Function to visualize the data
 def visualize():
     with st.container():
-        if dataframe.empty:
+        if ("dataframe" not in st.session_state
+                or st.session_state.dataframe.empty):
             st.write("No data available")
             return
 
-        st.dataframe(
-            data=dataframe[["platform", "text", "pred", "link"]],
-            use_container_width=True,
-            column_config={
-                "platform": "platform",
-                "text": "Comment",
-                "pred": "Predict",
-                "link": st.column_config.LinkColumn(
-                    "Link of comment",
-                ),
-            },
-        )
+        # plot dataframe
+        plot_dataframe()
 
         # plot count label predict by platform chart
-        count_label_pred_by_platform(dataframe)
+        count_label_pred_by_platform()
 
         # plot top words chart
-        for fig in plot_top_words(dataframe):
+        for fig in plot_top_words():
             st.plotly_chart(fig)
 
         # plot wordcloud chart
-        plot_wordcloud(dataframe)
+        plot_wordcloud()
 
 
 async def main():
-    init_page()
     placeholder = st.container()
+    sidebar()
     with placeholder.empty():
         while True:
             await fetch_data()

@@ -1,4 +1,5 @@
 # import libs
+import joblib
 import pandas as pd
 import streamlit as st
 import plotly.express as px
@@ -9,34 +10,79 @@ from wordcloud import WordCloud
 from _constants import STOP_WORDS_WITHOUT_DASH
 
 
-def init_page():
-    st.set_page_config(
-        page_title="Dashboard Phân biệt vùng miền",
-        page_icon="🙀",
-        layout="centered",
-        initial_sidebar_state="auto"
+# @st.cache_resource()
+def load_model():
+    return joblib.load("trained_models/RandomForest/pipe.joblib")
+    ...
+
+
+model = load_model()
+
+
+def sidebar():
+    with st.sidebar:
+        st.header("Bạn muốn kiểm tra thử comment của bạn có phân biệt vùng miền?")
+        # Initialize session state for text input and prediction
+        if 'text_input' not in st.session_state:
+            st.session_state.text_input = ''
+        if 'result' not in st.session_state:
+            st.session_state.result = None
+
+        # Capture text input
+        st.session_state.text_input = st.text_area(
+            "Nhập comment của bạn vào đây:", st.session_state.text_input)
+
+        if st.button("Kiểm tra"):
+            with st.spinner("Đang kiểm tra..."):
+                st.session_state.result = (
+                    model
+                    .predict_proba(
+                        [st.session_state.text_input]
+                    )[0]
+                )
+
+        if st.session_state.result is not None:
+            result_sorted = sorted(
+                enumerate(st.session_state.result), key=lambda x: x[1], reverse=True)
+
+            # st.write(f"Dự đoán: {st.session_state.result}")
+            interpretation = [
+                "khả năng là khác",
+                "khả năng có tính phân biệt vùng miền",
+                "khả năng có tính chống lại phân biệt vùng miền"
+            ]
+            result_text = f"Bình luận của bạn có Dự đoán:\n\n"
+            for idx, value in result_sorted:
+                result_text += f"- {value:.2%}% {interpretation[idx]}\n"
+            st.write(result_text)
+
+
+def plot_dataframe():
+    df: pd.DataFrame = st.session_state.dataframe
+    df = df[["platform", "text", "pred", "link"]]
+    st.dataframe(
+        data=df,
+        use_container_width=True,
+        column_config={
+            "platform": "platform",
+            "text": "Comment",
+            "pred": "Predict",
+            "link": st.column_config.LinkColumn(
+                "Link of comment",
+            ),
+        },
     )
 
-    st.markdown("# Dashboard Phân biệt vùng miền")
 
-    with st.sidebar:
-        st.header("What is this Project about?")
-        st.text(
-            "It is a Web app that helps the user determine whether they will get admission to a Graduate Program or not."
-        )
-        st.header("What tools were used to make this?")
-        st.text(
-            "The model was made using a dataset from Kaggle and trained using Kaggle notebooks. "
-            "We used Scikit-learn to create a Linear Regression Model."
-        )
+def count_label_pred_by_platform():
+    df: pd.DataFrame = st.session_state.dataframe
 
-
-def count_label_pred_by_platform(df: pd.DataFrame):
     group_df = (
         df
         .groupby(['platform', 'pred'])
         .size()
         .reset_index(name='count')
+        .sort_values(["platform", "pred"])
     )
 
     group_df["pred"] = group_df["pred"].astype(str)
@@ -44,12 +90,21 @@ def count_label_pred_by_platform(df: pd.DataFrame):
     fig = px.bar(
         group_df, x='platform', y='count',
         color='pred', barmode='group',
+        hover_data={'count': 'số lượng', 'pred': 'dự đoán'},
+    )
+
+    fig.update_layout(
+        title='Số lượng dự đoán của từng nền tảng',  # Update title
+        xaxis_title='Nền tảng',  # Update x-axis label
+        yaxis_title='Số lượng',  # Update y-axis label
     )
 
     return st.plotly_chart(fig)
 
 
-def plot_top_words(df):
+def plot_top_words():
+    df: pd.DataFrame = st.session_state.dataframe
+
     # Get the list of unique labels
     labels = sorted(df['pred'].unique())
 
@@ -149,8 +204,10 @@ def generate_wordcloud(
     return fig
 
 
-def plot_wordcloud(df: pd.DataFrame):
-    label = [0, 1, 2]
+def plot_wordcloud():
+    df: pd.DataFrame = st.session_state.dataframe
+
+    label: list[int] = sorted(df['pred'].unique())
     for i in label:
         series_text = df[df['pred'] == i]['text']
 
