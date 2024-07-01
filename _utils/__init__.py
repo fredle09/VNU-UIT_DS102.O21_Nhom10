@@ -25,7 +25,7 @@ def create_link_to_comment(row: dict) -> str:
         return row.get("comment_link")
 
     if platform == "tiktok":
-        return "Không hỗ trợ"
+        return None
     ...
 
 
