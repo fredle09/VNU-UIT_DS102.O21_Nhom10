@@ -34,6 +34,10 @@ async def fetch_data():
 # Function to visualize the data
 def visualize():
     with st.container():
+        if dataframe.empty:
+            st.write("No data available")
+            return
+
         st.dataframe(
             data=dataframe[["platform", "text", "pred", "link"]],
             use_container_width=True,
