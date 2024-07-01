@@ -54,7 +54,8 @@ def tokenization(sentences: str):
     return res_sentences
 
 
-def remove_stop_word(sentence: str):
+def remove_stop_word(sentence: str, with_dash: bool = False):
+    STOP_WORDS: list[str] = STOP_WORDS_WITH_DASH if with_dash else STOP_WORDS_WITHOUT_DASH
     words: list[str] = [word for word in sentence.split() if word.lower()
                         not in STOP_WORDS]
     sentence_after_removed: str = ' '.join(words)
