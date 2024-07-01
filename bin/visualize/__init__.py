@@ -118,7 +118,8 @@ def plot_top_words():
         for content in label_data['text']:
             words = content.split()
             for word in words:
-                if word in STOP_WORDS_WITHOUT_DASH:
+                if (word in STOP_WORDS_WITHOUT_DASH
+                        or word in ".!?,()[]{}-:;/\\'\""):
                     continue
 
                 if word in word_counts:
