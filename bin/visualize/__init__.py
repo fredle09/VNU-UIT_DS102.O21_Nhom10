@@ -13,8 +13,8 @@ def init_page():
     st.set_page_config(
         page_title="Dashboard Phân biệt vùng miền",
         page_icon="🙀",
-        layout="wide",
-        initial_sidebar_state="expanded"
+        layout="centered",
+        initial_sidebar_state="auto"
     )
 
     st.markdown("# Dashboard Phân biệt vùng miền")
