@@ -63,6 +63,9 @@ def plot_top_words(df):
         for content in label_data['text']:
             words = content.split()
             for word in words:
+                if word in STOP_WORDS_WITHOUT_DASH:
+                    continue
+
                 if word in word_counts:
                     word_counts[word] += 1
                 else:
