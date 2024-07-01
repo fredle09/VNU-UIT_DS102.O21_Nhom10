@@ -1,0 +1,38 @@
+{
+  "_name_or_path": "vinai/phobert-base",
+  "architectures": [
+    "RobertaForSequenceClassification"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bos_token_id": 0,
+  "classifier_dropout": null,
+  "eos_token_id": 2,
+  "gradient_checkpointing": false,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "id2label": {
+    "0": "kh\u00e1c",
+    "1": "ph\u00e2n bi\u1ec7t",
+    "2": "\u1ee7ng h\u1ed9"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "label2id": {
+    "kh\u00e1c": 0,
+    "ph\u00e2n bi\u1ec7t": 1,
+    "\u1ee7ng h\u1ed9": 2
+  },
+  "layer_norm_eps": 1e-05,
+  "max_position_embeddings": 258,
+  "model_type": "roberta",
+  "num_attention_heads": 12,
+  "num_hidden_layers": 12,
+  "pad_token_id": 1,
+  "position_embedding_type": "absolute",
+  "tokenizer_class": "PhobertTokenizer",
+  "transformers_version": "4.42.0.dev0",
+  "type_vocab_size": 1,
+  "use_cache": true,
+  "vocab_size": 64001
+}

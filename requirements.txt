@@ -2,3 +2,4 @@ streamlit==1.30.0
 pandas==1.5.2
 joblib==1.2.0
 pymongo==4.6.2
+transformers== 4.41.1

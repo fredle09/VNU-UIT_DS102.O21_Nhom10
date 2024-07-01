@@ -8,8 +8,6 @@ from typing import Optional, Callable, Any
 import pandas as pd
 import numpy as np
 
-import joblib
-
 
 PATH: str = os.path.dirname(os.path.abspath(__file__))
 
@@ -17,12 +15,13 @@ DELAY: int = 1
 
 CAPTURE_TOPIC: str = "capture"
 
-MODEL_NAME_LIST: list[str] = [
-    "random_forest_model",
-    "text_vectorizer"
-]
+KAFKA_BROKER_SERVER: str = "localhost:9092"
 
-MODEL_PATH: str = os.path.join(PATH, "trained_models/{}.joblib")
+MODEL_NAME_DICT = {
+    "PhoBERT": "vinai/phobert-base",
+    "BERTBase": "google-bert/bert-base-multilingual-cased",
+}
+MODEL_PATH: str = os.path.join(PATH, "trained_models/{}/tf_model.h5")
 
 TEENCODE_DICT: dict[str, str] = {
     "t": "tôi",
