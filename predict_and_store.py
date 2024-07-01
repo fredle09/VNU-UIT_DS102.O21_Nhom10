@@ -1,5 +1,4 @@
-# import constants
-from _constants import *
+# import libs
 from dotenv import load_dotenv
 
 # import bin
@@ -9,6 +8,9 @@ from bin.store import MongoDB
 
 # import _utils
 from _utils import create_link_to_comment
+
+# import constants
+from _constants import *
 
 
 load_dotenv()
