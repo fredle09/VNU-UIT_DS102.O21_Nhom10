@@ -2,6 +2,7 @@
 from kafka import KafkaProducer
 import json
 import csv
+import random
 
 # import constants
 from _constants import *
@@ -61,5 +62,6 @@ class Producer:
                 )
 
                 Producer.__producer.flush()
-                print({"topic": self.topic, "key": type_of_data, "value": row})
-                sleep(DELAY)
+                # print({"topic": self.topic, "key": type_of_data, "value": row})
+                time_to_sleep: float = random.random() * DELAY + DELAY / 2
+                sleep(time_to_sleep)
