@@ -86,11 +86,20 @@ TEENCODE_DICT: dict[str, str] = {
 }
 
 # https://github.com/stopwords/vietnamese-stopwords?tab=readme-ov-file#license
-# STOP_WORDS: list[str] = []
-# with open(
-#     "./vietnamese-stopwords-dash.txt",
-#     mode='r',
-#     encoding="utf-8"
-# ) as f:
-#     if len(STOP_WORDS) == 0:
-#         STOP_WORDS.extend(f.read().splitlines())
+STOP_WORDS_WITH_DASH: list[str] = []
+with open(
+    "./vietnamese-stopwords-dash.txt",
+    mode='r',
+    encoding="utf-8"
+) as f:
+    if len(STOP_WORDS_WITH_DASH) == 0:
+        STOP_WORDS_WITH_DASH.extend(f.read().splitlines())
+
+STOP_WORDS_WITHOUT_DASH: list[str] = []
+with open(
+    "./vietnamese-stopwords.txt",
+    mode='r',
+    encoding="utf-8"
+) as f:
+    if len(STOP_WORDS_WITHOUT_DASH) == 0:
+        STOP_WORDS_WITHOUT_DASH.extend(f.read().splitlines())
