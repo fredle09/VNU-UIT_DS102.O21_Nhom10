@@ -69,11 +69,12 @@ def plot_dataframe():
     df: pd.DataFrame = st.session_state.dataframe
     df = df[["platform", "text", "pred", "link"]]
     df["pred"] = df["pred"].apply(decode_label)
+    st.markdown("## Bảng dữ liệu")
     st.dataframe(
         data=df,
         use_container_width=True,
         column_config={
-            "platform": "platform",
+            "platform": "Platform",
             "text": "Comment",
             "pred": "Predict",
             "link": st.column_config.LinkColumn(
@@ -102,12 +103,7 @@ def count_label_pred_by_platform():
         hover_data={'count': 'số lượng', 'pred': 'dự đoán'},
     )
 
-    fig.update_layout(
-        title='Số lượng dự đoán của từng nền tảng',  # Update title
-        xaxis_title='Nền tảng',  # Update x-axis label
-        yaxis_title='Số lượng',  # Update y-axis label
-    )
-
+    st.markdown("## Số lượng dự đoán theo từng nền tảng")
     return st.plotly_chart(fig)
 
 
@@ -215,6 +211,7 @@ def generate_wordcloud(
 
 
 def plot_wordcloud():
+    st.markdown("## Word Cloud cho các từ theo từng nhãn")
     df: pd.DataFrame = st.session_state.dataframe
 
     label: list[int] = sorted(df['pred'].unique())
