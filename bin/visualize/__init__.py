@@ -53,7 +53,7 @@ def sidebar():
             ]
             result_text = f"Bình luận của bạn có Dự đoán:\n\n"
             for idx, value in result_sorted:
-                result_text += f"- {value:.2%}% {interpretation[idx]}\n"
+                result_text += f"- {value:.2%} {interpretation[idx]}\n"
             st.write(result_text)
 
 
