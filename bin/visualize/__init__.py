@@ -219,7 +219,6 @@ def plot_wordcloud():
         wordcloud_fig = generate_wordcloud(
             series_text,
             title=f"Word Cloud - Label: {label}",
-            width=st.get_option("theme.plotly.width")
         )
 
         st.plotly_chart(
