@@ -58,11 +58,12 @@ def sidebar():
 
 
 def decode_label(label: int) -> str:
-    return {
-        0: "Khác",
-        1: "Phân biệt",
-        2: "Ủng hộ"
-    }.get(label, "Khác")
+    # return {
+    #     "0": "Khác",
+    #     "1": "Phân biệt",
+    #     "2": "Ủng hộ"
+    # }.get(str(label), "Khác")
+    return label
 
 
 def plot_dataframe():
@@ -214,7 +215,7 @@ def plot_wordcloud():
     st.markdown("## Word Cloud cho các từ theo từng nhãn")
     df: pd.DataFrame = st.session_state.dataframe
 
-    label: list[int] = sorted(df['pred'].unique())
+    # label: list[int] = sorted(df['pred'].unique())
     for i in label:
         series_text = df[df['pred'] == i]['text']
 
