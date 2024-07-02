@@ -14,8 +14,6 @@ if "dataframe" not in st.session_state:
     st.session_state.dataframe = pd.DataFrame(
         columns=["platform", "text", "pred", "link"]
     )
-if "delta_count_dataframe" not in st.session_state:
-    st.session_state.delta_count_dataframe = 0
 
 st.set_page_config(
     page_title="Dashboard Phân biệt vùng miền",
@@ -40,7 +38,6 @@ database = init_connection()
 
 # Function to fetch data from the database
 async def fetch_data():
-    global dataframe
     items = database["predicts"].find()
     st.session_state.dataframe = pd.DataFrame(items)
 
