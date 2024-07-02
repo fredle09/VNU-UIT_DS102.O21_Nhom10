@@ -71,7 +71,7 @@ def plot_dataframe():
     df["pred"] = df["pred"].apply(decode_label)
     st.markdown("## Bảng dữ liệu")
     st.dataframe(
-        data=df,
+        data=df.iloc[::-1],
         use_container_width=True,
         column_config={
             "platform": "Platform",
