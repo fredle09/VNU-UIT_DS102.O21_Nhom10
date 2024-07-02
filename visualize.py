@@ -81,7 +81,7 @@ def visualize():
                 "Số lượng bình luận có tính phân biệt được xác định",
                 st.session_state.dataframe[
                     # label của phân biệt
-                    st.session_state.dataframe["pred"] == 1
+                    st.session_state.dataframe["pred"] == decode_label(1)
                 ].shape[0]
             )
 
