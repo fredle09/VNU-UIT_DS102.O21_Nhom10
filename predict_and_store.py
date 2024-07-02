@@ -1,6 +1,18 @@
+"""
+This script consumes messages from Kafka, predicts the sentiment of the message and stores
+the data in MongoDB.
+"""
+
+# import types
+from typing import Any
+
 # import libs
+import os
+import sys
+import threading
+from time import sleep
 from dotenv import load_dotenv
-from datetime import datetime
+import pandas as pd
 
 # import bin
 from bin.streaming.consumer import Consumer
@@ -11,12 +23,12 @@ from bin.store import MongoDB
 from _utils import create_link_to_comment
 
 # import constants
-from _constants import *
+from _constants import CAPTURE_TOPIC
 
 
 load_dotenv()
 
-data_bucket: list[Any] = []
+DATA_BUCKET: list[Any] = []
 
 MONGODB_ATLAS_URL = os.getenv('MONGODB_ATLAS_URL')
 if MONGODB_ATLAS_URL is None:
@@ -27,7 +39,11 @@ if MONGODB_ATLAS_DB_NAME is None:
 
 
 def consume_messages():
-    global data_bucket
+    """
+    Consume messages from Kafka.
+    """
+
+    global DATA_BUCKET
 
     con: Consumer = Consumer(
         topic=CAPTURE_TOPIC,
@@ -37,16 +53,19 @@ def consume_messages():
         for message in con.get_message():
             platform = message["key"]
             data = message["value"]
-            data_bucket.append({"platform": platform, **data})
+            DATA_BUCKET.append({"platform": platform, **data})
             print("Data received...")
     except KeyboardInterrupt:
         print("Exiting...")
-        exit(0)
-    ...
+        sys.exit(0)
 
 
 def predict_and_store():
-    global data_bucket
+    """
+    Predict the sentiment of the message and store the data in MongoDB.
+    """
+
+    global DATA_BUCKET
 
     pipe: Pipeline = Pipeline()
 
@@ -59,9 +78,9 @@ def predict_and_store():
 
     try:
         while True:
-            if len(data_bucket) != 0:
-                local_data_bucket = data_bucket
-                data_bucket = []  # clear data_bucket
+            if len(DATA_BUCKET) != 0:
+                local_data_bucket = DATA_BUCKET
+                DATA_BUCKET = []  # clear data_bucket
 
                 df_raw: pd.DataFrame = pd.DataFrame(local_data_bucket)
                 y_pred: pd.Series = pipe.run(df_raw)
@@ -80,8 +99,7 @@ def predict_and_store():
             sleep(5)
     except KeyboardInterrupt:
         print("Exiting...")
-        exit(0)
-    ...
+        sys.exit(0)
 
 
 if __name__ == '__main__':
@@ -92,9 +110,13 @@ if __name__ == '__main__':
         consumer_thread,
         predict_thread
     ]
-    [thread.start() for thread in threads]
+
+    for thread in threads:
+        thread.start()
+
     try:
-        [thread.join() for thread in threads]
+        for thread in threads:
+            thread.join()
     except KeyboardInterrupt:
         print("Exiting...")
-        exit(0)
+        sys.exit(0)

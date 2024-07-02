@@ -1,3 +1,10 @@
+"""
+This module contains the functions used to visualize the data and the model predictions.
+"""
+
+# import type
+from typing import Any
+
 # import libs
 import joblib
 import pandas as pd
@@ -11,15 +18,22 @@ from _constants import STOP_WORDS_WITHOUT_DASH
 
 
 # @st.cache_resource()
-def load_model():
+def load_model() -> Any:
+    """
+    Load the trained model.
+    """
+
     return joblib.load("trained_models/RandomForest/pipe.joblib")
-    ...
 
 
 model = load_model()
 
 
 def sidebar():
+    """
+    Creates the sidebar for the application.
+    """
+
     with st.sidebar:
         st.header("Bạn muốn kiểm tra thử comment của bạn có phân biệt vùng miền?")
         # Initialize session state for text input and prediction
@@ -51,18 +65,22 @@ def sidebar():
                 "khả năng có tính phân biệt vùng miền",
                 "khả năng có tính chống lại phân biệt vùng miền"
             ]
-            result_text = f"Bình luận của bạn có Dự đoán:\n\n"
+            result_text = "Bình luận của bạn có Dự đoán:\n\n"
             for idx, value in result_sorted:
                 result_text += f"- {value:.2%} {interpretation[idx]}\n"
             st.write(result_text)
 
 
 def plot_dataframe():
-    df: pd.DataFrame = st.session_state.dataframe
+    """
+    Plots the dataframe containing the comments and their predictions.
+    """
+
+    dataframe: pd.DataFrame = st.session_state.dataframe
 
     st.markdown("## Bảng dữ liệu")
     st.dataframe(
-        data=df.iloc[::-1],
+        data=dataframe.iloc[::-1],
         use_container_width=True,
         column_config={
             "platform": "Platform",
@@ -76,11 +94,15 @@ def plot_dataframe():
 
 
 def count_label_pred_by_platform():
-    df: pd.DataFrame = st.session_state.dataframe
-    df["Dự đoán"] = df["pred"]
+    """
+    Plots the number of predictions for each platform.
+    """
+
+    dataframe: pd.DataFrame = st.session_state.dataframe
+    dataframe["Dự đoán"] = dataframe["pred"]
 
     group_df = (
-        df
+        dataframe
         .groupby(['platform', 'Dự đoán'])
         .size()
         .reset_index(name='count')
@@ -97,18 +119,21 @@ def count_label_pred_by_platform():
         fig,
         use_container_width=True,
     )
-    return
 
 
 def plot_top_words():
-    df: pd.DataFrame = st.session_state.dataframe
+    """
+    Plots the top 20 most frequent words for each label in the dataset.
+    """
 
-    labels = sorted(df['pred'].unique())
+    dataframe: pd.DataFrame = st.session_state.dataframe
+
+    labels = sorted(dataframe['pred'].unique())
 
     # Loop through each label and plot the corresponding bar chart
     for label in labels:
         # Get the data for the current label
-        label_data = df[df['pred'] == label]
+        label_data = dataframe[dataframe['pred'] == label]
 
         # Create a dictionary to count the frequency of words
         word_counts = {}
@@ -156,6 +181,10 @@ def generate_wordcloud(
     title: str = "Word Cloud",
     width: int = 800
 ):
+    """
+    Generate a word cloud from a series of text data.
+    """
+
     # Concatenate all text in the series into a single string
     text = ' '.join(text_series).replace(',', ' ')
 
@@ -195,8 +224,8 @@ def generate_wordcloud(
     fig = px.imshow(image_array)
     fig.update_layout(
         title=title,
-        xaxis=dict(showgrid=False, zeroline=False, visible=False),
-        yaxis=dict(showgrid=False, zeroline=False, visible=False),
+        xaxis={"showgrid": False, "zeroline": False, "visible": False},
+        yaxis={"showgrid": False, "zeroline": False, "visible": False},
     )
 
     # Return the Plotly figure
@@ -204,13 +233,17 @@ def generate_wordcloud(
 
 
 def plot_wordcloud():
-    st.markdown("## Word Cloud cho các từ theo từng nhãn")
-    df: pd.DataFrame = st.session_state.dataframe
+    """
+    Plots a word cloud for each label in the dataset.
+    """
 
-    labels: list[int] = sorted(df['pred'].unique())
+    st.markdown("## Word Cloud cho các từ theo từng nhãn")
+    dataframe: pd.DataFrame = st.session_state.dataframe
+
+    labels: list[int] = sorted(dataframe['pred'].unique())
 
     for label in labels:
-        series_text = df[df['pred'] == label]['text']
+        series_text = dataframe[dataframe['pred'] == label]['text']
 
         if series_text.empty:
             st.text(f"Word Cloud - Label {label} is empty")

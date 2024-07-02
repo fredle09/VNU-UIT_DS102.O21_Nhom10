@@ -1,20 +1,37 @@
+"""
+Producer class
+"""
+
+# import type
+from typing import Any, Optional
+
 # import libs
-from kafka import KafkaProducer
+import os
+import random
 import json
 import csv
-import random
+from time import sleep
+from kafka import KafkaProducer
 
 # import constants
-from _constants import *
+from _constants import KAFKA_BROKER_SERVER, PATH, DELAY
 
 
 class Producer:
+    """
+    Kafka producer class.
+    """
+
     __producer: Optional[KafkaProducer] = None
 
     def __init__(
         self,
         topic: str,
     ) -> None:
+        """
+        Initialize the Kafka producer.
+        """
+
         if not Producer.__producer:
             Producer.__producer = KafkaProducer(
                 bootstrap_servers=KAFKA_BROKER_SERVER,
@@ -32,6 +49,10 @@ class Producer:
         key: str,
         value: Any,
     ):
+        """
+        Send a message to a Kafka topic.
+        """
+
         Producer.__producer.send(
             topic=self.topic,
             key=key,
@@ -43,6 +64,10 @@ class Producer:
         self,
         csv_file_path: str,
     ) -> None:
+        """
+        Send messages from a CSV file to a Kafka topic.
+        """
+
         full_path: str = os.path.join(
             PATH,
             "datasets",

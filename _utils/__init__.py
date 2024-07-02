@@ -1,15 +1,22 @@
-# import constants
-from _constants import *
+"""
+This file contains utility functions that are used in the project.
+"""
+
+# import libs
 import os
+import py_vncorenlp
 from transformers import BertTokenizer, TFBertForSequenceClassification
 import tensorflow as tf
 
-# import libs
-import py_vncorenlp
+# import constants
+from _constants import *
 
 
 def create_link_to_comment(row: dict) -> str:
-    YOUTUBE_URL_COMMENT_FORMAT = "https://www.youtube.com/watch?v={}&lc={}"
+    """
+    Creates a link to a comment based on the platform.
+    """
+
     platform: str = row.get("platform")
     if platform is None:
         raise ValueError("platform must be a column")
@@ -26,10 +33,15 @@ def create_link_to_comment(row: dict) -> str:
 
     if platform == "tiktok":
         return None
-    ...
+
+    raise ValueError("Invalid platform")
 
 
 class VnCoreNLP:
+    """
+    Singleton class for VnCoreNLP
+    """
+
     __instance = None
 
     def __new__(cls):
@@ -41,8 +53,15 @@ class VnCoreNLP:
 
         return cls.__instance
 
+    def __init__(self):
+        ...
+
 
 class LoadModel:
+    """
+    Singleton class for loading a model
+    """
+
     __instance = None
 
     def __new__(cls, model_name: str):
@@ -53,7 +72,11 @@ class LoadModel:
         return cls.__instance
 
     def _initialize(self, model_name: str):
-        if model_name not in MODEL_NAME_DICT.keys():
+        """
+        Initializes the model and tokenizer.
+        """
+
+        if model_name not in MODEL_NAME_DICT:
             raise ValueError("Model name not found in the dictionary")
 
         self.__instance = {}
@@ -71,9 +94,9 @@ class LoadModel:
         )
 
     def predict(self, input_text: str) -> int:
-        if (self.__instance["tokenizer"] is None
-                or self.__instance["model"] is None):
-            self._initialize(self._instance.model_name)
+        """
+        Predicts the class of the input text.
+        """
 
         inputs = self.__instance["tokenizer"](
             input_text, return_tensors="tf",

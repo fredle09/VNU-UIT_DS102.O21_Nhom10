@@ -1,3 +1,17 @@
+"""
+This module contains code for visualizing data in a dashboard for region differentiation.
+
+It imports necessary libraries, defines utility functions, and sets up the Streamlit dashboard.
+
+Functions:
+- decode_label(label: int) -> str: Decodes a label into its corresponding string value.
+- init_connection(): Initializes a connection to the MongoDB database.
+- fetch_data(): Fetches data from the database and updates the session state.
+- visualize(): Visualizes the data in the Streamlit dashboard.
+- main(): Main function that runs the Streamlit dashboard.
+
+"""
+
 # import libs
 import asyncio
 import streamlit as st
@@ -17,14 +31,24 @@ if "dataframe" not in st.session_state:
 
 
 def decode_label(label: int) -> str:
-    DEFAULT_VALUE: str = "Không xác định"
+    """
+    Decodes a label into its corresponding string value.
+
+    Args:
+        label (int): The label to decode.
+
+    Returns:
+        str: The decoded string value of the label.
+    """
+
+    default_value: str = "Không xác định"
     hashed_dict: dict[int, str] = {
         0: "Khác",
         1: "Phân biệt",
         2: "Ủng hộ"
     }
 
-    return hashed_dict.get(label, DEFAULT_VALUE)
+    return hashed_dict.get(label, default_value)
 
 
 st.set_page_config(
@@ -39,6 +63,13 @@ st.markdown("# Dashboard Phân biệt vùng miền")
 
 @st.cache_resource
 def init_connection():
+    """
+    Initializes a connection to the MongoDB database.
+
+    Returns:
+        MongoDB: A MongoDB object representing the connection to the database.
+    """
+
     return MongoDB(
         url=st.secrets["MONGODB_ATLAS_URL"],
         db_name=st.secrets["MONGODB_ATLAS_DB_NAME"],
@@ -50,20 +81,28 @@ database = init_connection()
 
 # Function to fetch data from the database
 async def fetch_data():
+    """
+    Fetches data from the database and updates the session state.
+    """
+
     items = database["predicts"].find()
-    df: pd.DataFrame = (
+    dataframe: pd.DataFrame = (
         pd
         .DataFrame(items)[
             ["platform", "text", "pred", "link"]
         ]
     )
-    df["pred"] = df["pred"].apply(decode_label)
+    dataframe["pred"] = dataframe["pred"].apply(decode_label)
 
-    st.session_state.dataframe = df
+    st.session_state.dataframe = dataframe
 
 
 # Function to visualize the data
 def visualize():
+    """
+    Visualizes the data in the Streamlit dashboard.
+    """
+
     with st.container():
         if ("dataframe" not in st.session_state
                 or st.session_state.dataframe.empty):
@@ -104,6 +143,10 @@ def visualize():
 
 
 async def main():
+    """
+    Main function that runs the Streamlit dashboard.
+    """
+
     placeholder = st.container()
     sidebar()
     with placeholder.empty():
