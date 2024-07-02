@@ -14,6 +14,8 @@ if "dataframe" not in st.session_state:
     st.session_state.dataframe = pd.DataFrame(
         columns=["platform", "text", "pred", "link"]
     )
+if "delta_count_dataframe" not in st.session_state:
+    st.session_state.delta_count_dataframe = 0
 
 st.set_page_config(
     page_title="Dashboard Phân biệt vùng miền",
@@ -51,6 +53,21 @@ def visualize():
             st.write("No data available")
             return
 
+        st_1, st_2 = st.columns([1, 1])
+        with st_1:
+            st.metric(
+                "Thống kê số lượng dữ liệu",
+                st.session_state.dataframe.shape[0]
+            )
+        with st_2:
+            st.metric(
+                "Số lượng bình luận có tính phân biệt được xác định",
+                st.session_state.dataframe[
+                    # label của phân biệt
+                    st.session_state.dataframe["pred"] == 1
+                ].shape[0]
+            )
+
         # plot dataframe
         plot_dataframe()
 
@@ -58,6 +75,7 @@ def visualize():
         count_label_pred_by_platform()
 
         # plot top words chart
+        st.markdown("## Top từ được sử dụng theo từng nhóm")
         for fig in plot_top_words():
             st.plotly_chart(fig)
 
