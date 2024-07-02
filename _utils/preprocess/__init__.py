@@ -29,13 +29,16 @@ def decoding_teencode(sentence: str):
 
 
 def remove_tag_icon_link(sentence: str):
-    sententce_after_replaced: str = re.sub(
-        r'[@,#]\w+\b',
-        '',
-        sentence
-    )
-
-    return sententce_after_replaced
+    try:
+        sententce_after_replaced: str = re.sub(
+            r'[@,#]\w+\b',
+            '',
+            sentence
+        )
+        return sententce_after_replaced
+    except Exception as e:
+        print(f"Have error {e} with sentence: {sentence}")
+        return ''
 
 
 def remove_icon_punct_rendun_space(sentence: str):

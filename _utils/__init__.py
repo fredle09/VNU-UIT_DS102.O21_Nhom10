@@ -71,6 +71,10 @@ class LoadModel:
         )
 
     def predict(self, input_text: str) -> int:
+        if (self.__instance["tokenizer"] is None
+                or self.__instance["model"] is None):
+            self._initialize(self._instance.model_name)
+
         inputs = self.__instance["tokenizer"](
             input_text, return_tensors="tf",
             padding=True, truncation=True

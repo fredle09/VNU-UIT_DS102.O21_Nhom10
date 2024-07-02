@@ -36,40 +36,36 @@ class Pipeline:
         if is_debug:
             print("Original:", X_copy.head(5), sep="\n", end="\n\n")
 
-        # decoding teencode
-        X_copy[output_col] = X_copy[output_col].map(decoding_teencode)
-        if is_debug:
-            print("Encoding Teencode:",
-                  X_copy[output_col].head(5), sep="\n", end="\n\n")
+        # remove tag-name, icon, link
+        X_copy = X_copy.applymap(remove_tag_icon_link)
+        print("Remove tag-name, icon, link:",
+              X_copy.head(5), sep="\n", end="\n\n")
 
-        # # remove tag-name, icon, link
-        # X_copy = X_copy.applymap(remove_tag_icon_link)
-        # print("Remove tag-name, icon, link:",
-        #       X_copy.head(5), sep="\n", end="\n\n")
-
-        # tokenization
-        X_copy[output_col] = X_copy[output_col].map(tokenization)
-        if is_debug:
-            print("Tokenizatioin:", X_copy.head(5), sep="\n", end="\n\n")
-
-        # # remove icon, punct, rendun space
-        # X_copy = X_copy.applymap(remove_icon_punct_rendun_space)
-        # print("Remove icon, punct, rendun space:",
-        #       X_copy, sep="\n", end="\n\n")
+        # remove icon, punct, rendun space
+        X_copy = X_copy.applymap(remove_icon_punct_rendun_space)
+        print("Remove icon, punct, rendun space:",
+              X_copy, sep="\n", end="\n\n")
 
         # lower case
         X_copy[output_col] = X_copy[output_col].map(lambda x: x.lower())
         if is_debug:
             print("Lower:", X_copy.head(5), sep="\n", end="\n\n")
 
-        # # remove stop word
-        # X_copy = X_copy.applymap(remove_stop_word)
-        # print("Remove stop Word:", X_copy.head(5), sep="\n", end="\n\n")
+        # tokenization
+        X_copy[output_col] = X_copy[output_col].map(tokenization)
+        if is_debug:
+            print("Tokenizatioin:", X_copy.head(5), sep="\n", end="\n\n")
 
         # normalize text
         X_copy[output_col] = X_copy[output_col].map(text_normalize)
         if is_debug:
             print("Normalize text:", X_copy.head(5), sep="\n", end="\n\n")
+
+        # decoding teencode
+        X_copy[output_col] = X_copy[output_col].map(decoding_teencode)
+        if is_debug:
+            print("Encoding Teencode:",
+                  X_copy[output_col].head(5), sep="\n", end="\n\n")
 
         return X_copy
 
