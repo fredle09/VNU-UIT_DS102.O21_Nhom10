@@ -87,20 +87,20 @@ def plot_dataframe():
 def count_label_pred_by_platform():
     df: pd.DataFrame = st.session_state.dataframe
 
+    df["pred"] = df["pred"].apply(decode_label)
+    df["Dự đoán"] = df["pred"]
+
     group_df = (
         df
-        .groupby(['platform', 'pred'])
+        .groupby(['platform', 'Dự đoán'])
         .size()
         .reset_index(name='count')
-        .sort_values(["platform", "pred"])
+        .sort_values(["platform", "Dự đoán"])
     )
-
-    group_df["pred"] = group_df["pred"].astype(str)
 
     fig = px.bar(
         group_df, x='platform', y='count',
-        color='pred', barmode='group',
-        hover_data={'count': 'số lượng', 'pred': 'dự đoán'},
+        color='Dự đoán', barmode='group',
     )
 
     st.markdown("## Số lượng dự đoán theo từng nền tảng")
