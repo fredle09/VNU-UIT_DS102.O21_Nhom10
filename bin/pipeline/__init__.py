@@ -38,13 +38,15 @@ class Pipeline:
 
         # remove tag-name, icon, link
         X_copy = X_copy.applymap(remove_tag_icon_link)
-        print("Remove tag-name, icon, link:",
-              X_copy.head(5), sep="\n", end="\n\n")
+        if is_debug:
+            print("Remove tag-name, icon, link:",
+                  X_copy.head(5), sep="\n", end="\n\n")
 
         # remove icon, punct, rendun space
         X_copy = X_copy.applymap(remove_icon_punct_rendun_space)
-        print("Remove icon, punct, rendun space:",
-              X_copy, sep="\n", end="\n\n")
+        if is_debug:
+            print("Remove icon, punct, rendun space:",
+                  X_copy, sep="\n", end="\n\n")
 
         # lower case
         X_copy[output_col] = X_copy[output_col].map(lambda x: x.lower())
