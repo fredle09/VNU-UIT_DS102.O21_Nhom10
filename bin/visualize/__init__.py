@@ -57,14 +57,9 @@ def sidebar():
             st.write(result_text)
 
 
-def decode_label(label: int) -> str:
-    return label
-
-
 def plot_dataframe():
     df: pd.DataFrame = st.session_state.dataframe
-    df = df[["platform", "text", "pred", "link"]]
-    df["pred"] = df["pred"].apply(decode_label)
+
     st.markdown("## Bảng dữ liệu")
     st.dataframe(
         data=df.iloc[::-1],
@@ -82,8 +77,6 @@ def plot_dataframe():
 
 def count_label_pred_by_platform():
     df: pd.DataFrame = st.session_state.dataframe
-
-    df["pred"] = df["pred"].apply(decode_label)
     df["Dự đoán"] = df["pred"]
 
     group_df = (
@@ -100,13 +93,16 @@ def count_label_pred_by_platform():
     )
 
     st.markdown("## Số lượng dự đoán theo từng nền tảng")
-    return st.plotly_chart(fig)
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+    )
+    return
 
 
 def plot_top_words():
     df: pd.DataFrame = st.session_state.dataframe
 
-    # Get the list of unique labels
     labels = sorted(df['pred'].unique())
 
     # Loop through each label and plot the corresponding bar chart
@@ -144,7 +140,7 @@ def plot_top_words():
         )
 
         fig.update_layout(
-            title=f"Top 20 words",
+            title=f"Top 20 words - Label: {label}",
             xaxis_title="Word",
             yaxis_title="Frequency",
             xaxis_tickangle=-45
@@ -157,7 +153,8 @@ def plot_top_words():
 # WordCloud
 def generate_wordcloud(
     text_series: pd.Series,
-    title: str = "Word Cloud"
+    title: str = "Word Cloud",
+    width: int = 800
 ):
     # Concatenate all text in the series into a single string
     text = ' '.join(text_series).replace(',', ' ')
@@ -183,7 +180,7 @@ def generate_wordcloud(
 
     # Create and generate a word cloud image
     wordcloud = WordCloud(
-        width=800, height=400,
+        width=width, height=400,
         background_color='white'
     )
 
@@ -210,17 +207,22 @@ def plot_wordcloud():
     st.markdown("## Word Cloud cho các từ theo từng nhãn")
     df: pd.DataFrame = st.session_state.dataframe
 
-    label: list[int] = sorted(df['pred'].unique())
-    for i in label:
-        series_text = df[df['pred'] == i]['text']
+    labels: list[int] = sorted(df['pred'].unique())
+
+    for label in labels:
+        series_text = df[df['pred'] == label]['text']
 
         if series_text.empty:
-            st.text(f"Word Cloud is empty")
+            st.text(f"Word Cloud - Label {label} is empty")
             continue
 
         wordcloud_fig = generate_wordcloud(
             series_text,
-            title=f"Word Cloud"
+            title=f"Word Cloud - Label: {label}",
+            width=st.get_option("theme.plotly.width", 800)
         )
 
-        st.plotly_chart(wordcloud_fig)
+        st.plotly_chart(
+            wordcloud_fig,
+            use_container_width=True,
+        )

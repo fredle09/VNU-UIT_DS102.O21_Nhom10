@@ -15,10 +15,22 @@ if "dataframe" not in st.session_state:
         columns=["platform", "text", "pred", "link"]
     )
 
+
+def decode_label(label: int) -> str:
+    DEFAULT_VALUE: str = "Không xác định"
+    hashed_dict: dict[int, str] = {
+        0: "Khác",
+        1: "Phân biệt",
+        2: "Ủng hộ"
+    }
+
+    return hashed_dict.get(label, DEFAULT_VALUE)
+
+
 st.set_page_config(
     page_title="Dashboard Phân biệt vùng miền",
     page_icon="🙀",
-    layout="centered",
+    layout="wide",
     initial_sidebar_state="auto"
 )
 
@@ -39,7 +51,15 @@ database = init_connection()
 # Function to fetch data from the database
 async def fetch_data():
     items = database["predicts"].find()
-    st.session_state.dataframe = pd.DataFrame(items)
+    df: pd.DataFrame = (
+        pd
+        .DataFrame(items)[
+            ["platform", "text", "pred", "link"]
+        ]
+    )
+    df["pred"] = df["pred"].apply(decode_label)
+
+    st.session_state.dataframe = df
 
 
 # Function to visualize the data
@@ -74,7 +94,10 @@ def visualize():
         # plot top words chart
         st.markdown("## Top từ được sử dụng theo từng nhóm")
         for fig in plot_top_words():
-            st.plotly_chart(fig)
+            st.plotly_chart(
+                fig,
+                use_container_width=True,
+            )
 
         # plot wordcloud chart
         plot_wordcloud()
@@ -84,11 +107,11 @@ async def main():
     placeholder = st.container()
     sidebar()
     with placeholder.empty():
-        while True:
-            await fetch_data()
+        # while True:
+        await fetch_data()
 
-            visualize()
-            await asyncio.sleep(5)
+        visualize()
+        await asyncio.sleep(5)
 
 
 if __name__ == '__main__':
