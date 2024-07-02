@@ -57,9 +57,18 @@ def sidebar():
             st.write(result_text)
 
 
+def decode_label(label: int) -> str:
+    return {
+        0: "Khác",
+        1: "Phân biệt",
+        2: "Ủng hộ"
+    }.get(label, "Khác")
+
+
 def plot_dataframe():
     df: pd.DataFrame = st.session_state.dataframe
     df = df[["platform", "text", "pred", "link"]]
+    df["pred"] = df["pred"].apply(decode_label)
     st.dataframe(
         data=df,
         use_container_width=True,
@@ -143,7 +152,7 @@ def plot_top_words():
         )
 
         fig.update_layout(
-            title=f"Top 20 words - Label: {label}",
+            title=f"Top 20 words - Label: {decode_label(label)}",
             xaxis_title="Word",
             yaxis_title="Frequency",
             xaxis_tickangle=-45
@@ -213,12 +222,12 @@ def plot_wordcloud():
         series_text = df[df['pred'] == i]['text']
 
         if series_text.empty:
-            st.text(f"Word Cloud - Label: {i} is empty")
+            st.text(f"Word Cloud - Label: {decode_label(i)} is empty")
             continue
 
         wordcloud_fig = generate_wordcloud(
             series_text,
-            title=f"Word Cloud - Label: {i}"
+            title=f"Word Cloud - Label: {decode_label(i)}"
         )
 
         st.plotly_chart(wordcloud_fig)
