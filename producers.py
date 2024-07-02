@@ -1,11 +1,22 @@
+"""
+This module contains the functions used to produce the data.
+"""
+
+# import libs
+import threading
+
 # import bin
 from bin.streaming.producer import Producer
 
 # import constants
-from _constants import *
+from _constants import CAPTURE_TOPIC
 
 
 def main():
+    """
+    Main function.
+    """
+
     # Create instances of Producer
     prod = Producer(topic=CAPTURE_TOPIC)
 
@@ -31,8 +42,11 @@ def main():
         ),
     ]
 
-    [thread.start() for thread in threads]
-    [thread.join() for thread in threads]
+    for thread in threads:
+        thread.start()
+
+    for thread in threads:
+        thread.join()
 
 
 if __name__ == '__main__':

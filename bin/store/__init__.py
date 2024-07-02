@@ -1,3 +1,7 @@
+"""
+Store package
+"""
+
 # import libs
 from pymongo.mongo_client import MongoClient
 
@@ -6,6 +10,10 @@ from _constants import *
 
 
 class MongoDB:
+    """
+    MongoDB class
+    """
+
     __db = None
 
     def __new__(cls, url: str, db_name: str):
@@ -17,8 +25,8 @@ class MongoDB:
                 print("You successfully connected to MongoDB!")
 
                 cls.__db = client[db_name]
-            except Exception as e:
-                print(e)
+            except Exception as err:
+                print(err)
                 cls.__db = None
 
         return cls.__db

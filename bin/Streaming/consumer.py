@@ -1,12 +1,23 @@
+"""
+Consumer class for Kafka.
+"""
+
+# import type
+from typing import Optional
+
 # import libs
-from kafka import KafkaConsumer
 import json
+from kafka import KafkaConsumer
 
 # import constants
-from _constants import *
+from _constants import KAFKA_BROKER_SERVER
 
 
 class Consumer:
+    """
+    Kafka consumer class.
+    """
+
     def __init__(
         self,
         topic: str,
@@ -30,12 +41,22 @@ class Consumer:
         )
 
     @staticmethod
-    def __safe_json_loads(x):
+    def __safe_json_loads(data: bytes):
+        """
+        Safely load JSON data.
+
+        Args:
+            data (bytes): The JSON data.
+
+        Returns:
+            dict: The JSON data.
+        """
+
         try:
-            return json.loads(x.decode('utf-8'))
-        except json.JSONDecodeError as e:
-            print(f"JSONDecodeError: {e}")
-            print(f"Raw data: {x}")
+            return json.loads(data.decode('utf-8'))
+        except json.JSONDecodeError as err:
+            print(f"JSONDecodeError: {err}")
+            print(f"Raw data: {data}")
             print("---")
             return None
 
@@ -43,6 +64,12 @@ class Consumer:
         self,
         key: Optional[str] = None,
     ):
+        """
+        Get a message from a Kafka topic.
+
+        Args:
+            key (Optional[str]): The key of the message.
+        """
         for message in self.__consumer:
             if key is not None and message.key != key:
                 continue
