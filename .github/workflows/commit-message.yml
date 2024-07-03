@@ -23,6 +23,9 @@ jobs:
         uses: wagoid/commitlint-github-action@v6
         with:
           configFile: commitlint.config.js
+          failOnWarnings: false
+          failOnErrors: true
+          helpURL: https://github.com/conventional-changelog/commitlint/#what-is-commitlint
 
       - name: Fail if commit message is invalid
         if: steps.commit-message-linter.outputs.result == 'fail'

@@ -18,6 +18,6 @@ module.exports = {
         'test',
       ],
     ],
-    'subject-case': [2, 'always', 'sentence-case'],
+    'subject-case': [2, 'always', 'lower-case'],
   },
 };
