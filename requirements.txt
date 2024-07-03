@@ -6,3 +6,9 @@ transformers== 4.41.1
 wordcloud==1.9.3
 plotly==5.18.0
 scikit-learn==1.2.2
+py_vncorenlp==0.1.4
+tensorflow==2.16.2
+gensim==4.3.2
+underthesea==6.8.3
+kafka-python==2.0.2
+python-dotenv==1.0.0
