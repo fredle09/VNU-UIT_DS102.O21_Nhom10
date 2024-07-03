@@ -22,7 +22,7 @@ jobs:
         id: commit-message-linter
         uses: wagoid/commitlint-github-action@v6
         with:
-          configFile: commitlint.config.js
+          configFile: commitlint.config.mjs
           failOnWarnings: false
           failOnErrors: true
           helpURL: https://github.com/conventional-changelog/commitlint/#what-is-commitlint
