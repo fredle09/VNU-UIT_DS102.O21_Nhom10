@@ -1,0 +1,29 @@
+name: Commit Message Linter
+
+on:
+  push:
+    branches:
+      - main
+      - "feature/**"
+  pull_request:
+    branches:
+      - main
+      - "feature/**"
+
+jobs:
+  commit-message-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Commit Message Linter
+        id: commit-message-linter
+        uses: wagoid/commitlint-github-action@v6
+        with:
+          configFile: commitlint.config.js
+
+      - name: Fail if commit message is invalid
+        if: steps.commit-message-linter.outputs.result == 'fail'
+        run: exit 1
